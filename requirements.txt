@@ -1,0 +1,9 @@
+numpy>=1.24
+pandas>=2.0
+backtrader
+matplotlib
+quantstats
+ipython
+jinja2
+
+#pip install --upgrade --force-reinstall -r requirements.txt
