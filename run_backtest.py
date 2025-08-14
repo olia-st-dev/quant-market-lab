@@ -122,18 +122,31 @@ def run_backtest():
     daily_dd = daily_curve / daily_curve.cummax() - 1.0
     max_daily_dd = daily_dd.min()
 
-    print(f"\n📉 Max Daily Drawdown: {max_daily_dd:.2%}")
+    print(f"\nMax Daily Drawdown: {max_daily_dd:.2%}")
     daily_dd.to_csv(os.path.join(report_path, "daily_drawdown.csv"))
-    print("✅ Daily drawdown saved to 'daily_drawdown.csv'")
+    print("Daily drawdown saved to 'daily_drawdown.csv'")
 
     # --- QuantStats report (use daily returns) ---
+    qs_report_filename = "qs_report.html"
+    qs_report_path = os.path.join(report_path, qs_report_filename)
+
     qs.reports.html(
         daily_returns,
-        output=os.path.join(report_path, "qs_report.html"),
+        output=qs_report_path,
         title=f"{PAIR} Strategy Performance",
     )
-    eq.to_csv(os.path.join(report_path, "equity_debug.csv"))
-    print("✅ QuantStats report saved as 'qs_report.html'")
+    print(f"QuantStats report saved as '{qs_report_path}'")
+
+    # Save a copy into docs/ for GitHub Pages
+    ensure_dir("docs")
+    qs_docs_filename = (
+        f"{STRATEGY.__name__}_{PAIR}_{MAIN_TF}_"
+        f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_qs_report.html"
+    )
+    qs_docs_path = os.path.join("docs", qs_docs_filename)
+    import shutil
+    shutil.copy(qs_report_path, qs_docs_path)
+    print(f"QuantStats report also copied to '{qs_docs_path}' for GitHub Pages")
 
     # --- Summary ---
     final_value = cerebro.broker.getvalue()
